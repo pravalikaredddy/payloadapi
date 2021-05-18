@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="propreadFlow" doc:id="7909fb40-89ab-4943-9d55-7f65b9ae6dc6" >
+		<http:listener doc:name="Listener" doc:id="2728c36e-87b0-416c-bb71-b8804ad3016f" config-ref="HTTP_Listener_config" path="/propread"/>
+		<logger level="INFO" doc:name="Logger" doc:id="86eb722d-c22a-4b66-b4c4-4839b89b7d82" message='#["start the logger"]'/>
+		<ee:transform doc:name="Transform Message" doc:id="c8b50e62-5ab8-4c39-8bdb-27a4201ada6a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"empName": p('stdName')
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

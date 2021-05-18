@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="ede75047-d3de-49eb-ad15-a0a8dbe8bee8" >
+		<http:listener-connection host="${http.host}" port="${http.port}" />
+	</http:listener-config>
+	<configuration-properties doc:name="Configuration properties" doc:id="302144c8-30cf-40af-a97b-941ed97b6be7" file="mule.properties" />
+	<flow name="payloadapiFlow" doc:id="827f1e31-c876-4155-b4ac-2135b117d14e">
+		<http:listener doc:name="Listener" doc:id="10e9357b-b8b5-4a27-8ee3-05d421e91c48" config-ref="HTTP_Listener_config" path="${http.path}" allowedMethods="POST"/>
+		<logger level="INFO" doc:name="Logger" doc:id="92f127ae-9380-4fa0-8cc7-e4862bcda55a" message='#[payload]'/>
+		<logger level="INFO" doc:name="Logger" doc:id="a874e9bb-1044-41d3-96da-ce1889a52bec" message="#[payload.Colleges.Branchdetails.Branch]"/>
+		<set-variable value="#[payload.Colleges.Collegename]" doc:name="Set Variable" doc:id="a9623289-e00b-427a-a1f9-24055fc2286d" variableName="retVar"/>
+		<ee:transform doc:name="Transform Message" doc:id="b6aa96ca-6da5-40c0-8641-da720151fdce" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"pay": "Entering choice"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<choice doc:name="Choice" doc:id="b05d7b8a-096b-469e-afee-bcbd1bb1f553" >
+			<when expression="#[vars.retVar=='Vignan']">
+				<ee:transform doc:name="Transform Message" doc:id="f4ac026a-d73e-4de9-a3e2-4e7c52d08a54" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "retvar": vars.retVar
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<logger level="INFO" doc:name="Logger" doc:id="6f2685f8-bbce-4eb2-b881-c661a2ef0889" message='#["start logger"]'/>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger" doc:id="d17158c7-56cb-44b5-90d8-4cec85549c81" message='#["record not found"]'/>
+			</otherwise>
+		</choice>
+	</flow>
+</mule>
